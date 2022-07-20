@@ -329,13 +329,21 @@ function decodeString(str) {
   return p;
 }
 
+// This is backported from socket.io-parser 3.3.0 branch
+function isValidPacket(packet) {
+  return packet.data !== false && (packet.type === exports.ERROR || isArray(packet.data));
+}
+
 function tryParse(p, str) {
   try {
     p.data = json.parse(str);
-  } catch(e){
+    if (!isValidPacket(p)) {
+      throw new Error(`invald payload for packet.type ${p.type}`)
+    }
+  } catch(e) {
     return error();
   }
-  return p; 
+  return p;
 };
 
 /**
